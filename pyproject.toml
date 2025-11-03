@@ -1,4 +1,4 @@
-wdawk[project]
+[project]
 name = "varasto"
 version = "0.1.0"
 description = ""
