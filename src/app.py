@@ -1,8 +1,10 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from varasto import Varasto
 
 app = Flask(__name__)
-app.secret_key = 'dev_secret_key_change_in_production'
+# Use environment variable for production, fallback to dev key for development
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'dev_secret_key_change_in_production')
 
 # In-memory storage for warehouses
 warehouses = {}

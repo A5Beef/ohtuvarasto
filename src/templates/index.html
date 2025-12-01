@@ -24,7 +24,7 @@
                         <span class="stat-value">{{ "%.2f"|format(warehouse.varasto.paljonko_mahtuu()) }}</span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ (warehouse.varasto.saldo / warehouse.varasto.tilavuus * 100)|round }}%"></div>
+                        <div class="progress-fill" style="width: {{ (warehouse.varasto.saldo / warehouse.varasto.tilavuus * 100 if warehouse.varasto.tilavuus > 0 else 0)|round }}%"></div>
                     </div>
                 </div>
                 <div class="warehouse-actions">
