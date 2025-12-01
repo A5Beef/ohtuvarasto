@@ -6,7 +6,7 @@ app.secret_key = 'dev_secret_key_change_in_production'
 
 # In-memory storage for warehouses
 warehouses = {}
-warehouse_id_counter = 0
+WAREHOUSE_ID_COUNTER = 0
 
 
 @app.route('/')
@@ -19,27 +19,27 @@ def index():
 def create_warehouse():
     """Create a new warehouse."""
     if request.method == 'POST':
-        global warehouse_id_counter
+        global WAREHOUSE_ID_COUNTER
         name = request.form.get('name', '').strip()
         try:
             tilavuus = float(request.form.get('tilavuus', 0))
             alku_saldo = float(request.form.get('alku_saldo', 0))
-            
+
             if not name:
                 flash('Warehouse name is required', 'error')
                 return render_template('create_warehouse.html')
-            
+
             if tilavuus <= 0:
                 flash('Capacity must be greater than 0', 'error')
                 return render_template('create_warehouse.html')
-            
+
             if alku_saldo < 0:
                 flash('Initial balance cannot be negative', 'error')
                 return render_template('create_warehouse.html')
-            
-            warehouse_id_counter += 1
-            warehouses[warehouse_id_counter] = {
-                'id': warehouse_id_counter,
+
+            WAREHOUSE_ID_COUNTER += 1
+            warehouses[WAREHOUSE_ID_COUNTER] = {
+                'id': WAREHOUSE_ID_COUNTER,
                 'name': name,
                 'varasto': Varasto(tilavuus, alku_saldo)
             }
@@ -48,7 +48,7 @@ def create_warehouse():
         except ValueError:
             flash('Invalid number format', 'error')
             return render_template('create_warehouse.html')
-    
+
     return render_template('create_warehouse.html')
 
 
@@ -58,7 +58,7 @@ def view_warehouse(warehouse_id):
     if warehouse_id not in warehouses:
         flash('Warehouse not found', 'error')
         return redirect(url_for('index'))
-    
+
     warehouse = warehouses[warehouse_id]
     return render_template('view_warehouse.html', warehouse=warehouse)
 
@@ -69,33 +69,38 @@ def edit_warehouse(warehouse_id):
     if warehouse_id not in warehouses:
         flash('Warehouse not found', 'error')
         return redirect(url_for('index'))
-    
+
     warehouse = warehouses[warehouse_id]
-    
+
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         try:
             tilavuus = float(request.form.get('tilavuus', 0))
-            
+
             if not name:
                 flash('Warehouse name is required', 'error')
-                return render_template('edit_warehouse.html', warehouse=warehouse)
-            
+                return render_template(
+                    'edit_warehouse.html', warehouse=warehouse)
+
             if tilavuus <= 0:
                 flash('Capacity must be greater than 0', 'error')
-                return render_template('edit_warehouse.html', warehouse=warehouse)
-            
+                return render_template(
+                    'edit_warehouse.html', warehouse=warehouse)
+
             # Keep the current saldo but update capacity
             current_saldo = warehouse['varasto'].saldo
             warehouse['name'] = name
             warehouse['varasto'] = Varasto(tilavuus, current_saldo)
-            
+
             flash(f'Warehouse "{name}" updated successfully', 'success')
-            return redirect(url_for('view_warehouse', warehouse_id=warehouse_id))
+            return redirect(
+                url_for(
+                    'view_warehouse',
+                    warehouse_id=warehouse_id))
         except ValueError:
             flash('Invalid number format', 'error')
             return render_template('edit_warehouse.html', warehouse=warehouse)
-    
+
     return render_template('edit_warehouse.html', warehouse=warehouse)
 
 
@@ -108,7 +113,7 @@ def delete_warehouse(warehouse_id):
         flash(f'Warehouse "{name}" deleted successfully', 'success')
     else:
         flash('Warehouse not found', 'error')
-    
+
     return redirect(url_for('index'))
 
 
@@ -118,25 +123,34 @@ def add_to_warehouse(warehouse_id):
     if warehouse_id not in warehouses:
         flash('Warehouse not found', 'error')
         return redirect(url_for('index'))
-    
+
     warehouse = warehouses[warehouse_id]
     try:
         maara = float(request.form.get('maara', 0))
-        
+
         if maara <= 0:
             flash('Amount must be greater than 0', 'error')
-            return redirect(url_for('view_warehouse', warehouse_id=warehouse_id))
-        
+            return redirect(
+                url_for(
+                    'view_warehouse',
+                    warehouse_id=warehouse_id))
+
         available_space = warehouse['varasto'].paljonko_mahtuu()
         if maara > available_space:
-            flash(f'Not enough space. Available: {available_space:.2f}', 'error')
-            return redirect(url_for('view_warehouse', warehouse_id=warehouse_id))
-        
+            flash(
+                f'Not enough space. Available: {
+                    available_space:.2f}',
+                'error')
+            return redirect(
+                url_for(
+                    'view_warehouse',
+                    warehouse_id=warehouse_id))
+
         warehouse['varasto'].lisaa_varastoon(maara)
         flash(f'Added {maara:.2f} to warehouse', 'success')
     except ValueError:
         flash('Invalid number format', 'error')
-    
+
     return redirect(url_for('view_warehouse', warehouse_id=warehouse_id))
 
 
@@ -146,24 +160,33 @@ def remove_from_warehouse(warehouse_id):
     if warehouse_id not in warehouses:
         flash('Warehouse not found', 'error')
         return redirect(url_for('index'))
-    
+
     warehouse = warehouses[warehouse_id]
     try:
         maara = float(request.form.get('maara', 0))
-        
+
         if maara <= 0:
             flash('Amount must be greater than 0', 'error')
-            return redirect(url_for('view_warehouse', warehouse_id=warehouse_id))
-        
+            return redirect(
+                url_for(
+                    'view_warehouse',
+                    warehouse_id=warehouse_id))
+
         if maara > warehouse['varasto'].saldo:
-            flash(f'Not enough content. Available: {warehouse["varasto"].saldo:.2f}', 'error')
-            return redirect(url_for('view_warehouse', warehouse_id=warehouse_id))
-        
+            flash(
+                f'Not enough content. Available: {
+                    warehouse["varasto"].saldo:.2f}',
+                'error')
+            return redirect(
+                url_for(
+                    'view_warehouse',
+                    warehouse_id=warehouse_id))
+
         warehouse['varasto'].ota_varastosta(maara)
         flash(f'Removed {maara:.2f} from warehouse', 'success')
     except ValueError:
         flash('Invalid number format', 'error')
-    
+
     return redirect(url_for('view_warehouse', warehouse_id=warehouse_id))
 
 
