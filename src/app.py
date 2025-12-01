@@ -11,6 +11,30 @@ warehouses = {}
 WAREHOUSE_ID_COUNTER = 0
 
 
+def initialize_example_warehouses():
+    """Initialize example warehouses for users to see."""
+    global WAREHOUSE_ID_COUNTER
+    
+    # Create example warehouses similar to index.py
+    WAREHOUSE_ID_COUNTER += 1
+    warehouses[WAREHOUSE_ID_COUNTER] = {
+        'id': WAREHOUSE_ID_COUNTER,
+        'name': 'Mehuvarasto',
+        'varasto': Varasto(100.0)
+    }
+    
+    WAREHOUSE_ID_COUNTER += 1
+    warehouses[WAREHOUSE_ID_COUNTER] = {
+        'id': WAREHOUSE_ID_COUNTER,
+        'name': 'Olutvarasto',
+        'varasto': Varasto(100.0, 20.2)
+    }
+
+
+# Initialize example warehouses on startup
+initialize_example_warehouses()
+
+
 @app.route('/')
 def index():
     """Display all warehouses."""
