@@ -23,6 +23,19 @@ A Flask-based web user interface is available for managing warehouses.
 
 3. Open your browser and navigate to `http://127.0.0.1:5000`
 
+### Configuration
+
+The application supports the following environment variables:
+
+- `FLASK_SECRET_KEY`: Secret key for session management (required for production)
+- `FLASK_DEBUG`: Set to `true` to enable debug mode (default: `false`)
+
+Example for development with debug mode:
+```bash
+export FLASK_DEBUG=true
+python3 app.py
+```
+
 ### Features
 
 - **Create warehouses**: Define capacity and initial balance
